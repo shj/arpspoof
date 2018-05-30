@@ -1,0 +1,41 @@
+# $Id: Makefile.in,v 1.11 2004/11/02 16:05:04 shj Exp $
+
+THIS_VERSION = 2-beta
+THIS_NAME = sarp
+THIS_PLATFORM = @host@
+THIS_AUTHOR = shj
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+sbindir = @sbindir@
+srcdir = @srcdir@
+
+CC = @CC@
+DEFS = @DEFS@ -I. -DVERSION=\"$(THIS_VERSION)\" -DNAME=\"$(THIS_NAME)\" -DAUTHOR=\"$(THIS_AUTHOR)\"
+CFLAGS = @CFLAGS@ $(DEFS)
+LIBS = @LIBS@
+SHTOOL = ./shtool
+INSTALL = $(SHTOOL) install
+TARGET = sarp
+PSRC = pctl-@V_PCTL@.c
+POBJ = pctl-@V_PCTL@.o
+SRC =   readconf.c main.c arp.c utils.c pctl.c getopt.c getopt1.c $(PSRC)
+OBJS =  readconf.o main.o arp.o utils.o pctl.o getopt.o getopt1.o $(POBJ)
+DEPS =  readconf.h pctl.h types.h utils.h getopt.h
+
+all: $(TARGET)
+
+$(TARGET): $(DEPS) $(OBJS) $(SRC)
+	rm -f $@
+	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+
+clean:
+	rm -f $(OBJS) $(TARGET) config.cache Makefile config.status config.h \
+				config.log configure.lineno *~
+
+install: $(TARGET)
+	$(SHTOOL) mkdir -f -p -m 755 $(bindir)
+	$(INSTALL) -c -m 755 $(TARGET) $(bindir)/$(TARGET)
+
+uninstall:
+	rm -f $(bindir)/$(TARGET)
